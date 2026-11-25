@@ -1,0 +1,186 @@
+
+.nexus-navigation {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 28px 18px 18px;
+    color: #e5edf8;
+    background: #0c1422;
+}
+
+/* Marca */
+
+.nexus-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0 8px 34px;
+}
+
+.nexus-brand-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 43px;
+    height: 43px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #0891b2, #6366f1);
+    color: white;
+    font-size: 16px;
+    font-weight: 900;
+    box-shadow: 0 5px 20px rgba(34, 211, 238, 0.18);
+}
+
+.nexus-brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.nexus-brand-name {
+    font-size: 17px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+}
+
+.nexus-brand-subtitle {
+    color: #22d3ee;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.7px;
+}
+
+/* Secciones */
+
+.nexus-menu-section {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.nexus-menu-heading {
+    padding-left: 12px;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+}
+
+.nexus-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.nexus-nav-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    min-height: 46px;
+    padding: 0 13px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    color: #91a0b5;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.nexus-nav-link:hover {
+    color: #e5edf8;
+    background: rgba(148, 163, 184, 0.08);
+}
+
+.nexus-nav-link.active {
+    color: #22d3ee;
+    background: rgba(34, 211, 238, 0.09);
+    border-color: rgba(34, 211, 238, 0.15);
+}
+
+.nexus-nav-icon {
+    width: 22px;
+    text-align: center;
+    font-size: 19px;
+}
+
+.nexus-nav-indicator {
+    width: 5px;
+    height: 5px;
+    margin-left: auto;
+    border-radius: 50%;
+    background: transparent;
+}
+
+.nexus-nav-link.active .nexus-nav-indicator {
+    background: #22d3ee;
+    box-shadow: 0 0 8px #22d3ee;
+}
+
+/* Perfil y pie */
+
+.nexus-sidebar-bottom {
+    margin-top: auto;
+    padding-top: 25px;
+}
+
+.nexus-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 8px;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.nexus-profile-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #172c43;
+    color: #22d3ee;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.nexus-profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.nexus-profile-name {
+    color: #e5edf8;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.nexus-profile-role {
+    color: #8292a9;
+    font-size: 10px;
+}
+
+.nexus-profile-status {
+    width: 7px;
+    height: 7px;
+    margin-left: auto;
+    border-radius: 50%;
+    background: #22c55e;
+}
+
+.nexus-version {
+    display: flex;
+    justify-content: space-between;
+    gap: 5px;
+    padding: 16px 4px 0;
+    color: #64748b;
+    font-size: 9px;
+}
+
+.nexus-version span {
+    color: #475569;
+}

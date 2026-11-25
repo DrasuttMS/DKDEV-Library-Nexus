@@ -1,0 +1,492 @@
+
+@page "/"
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components.Forms
+@using BlazorBiblioteca.Shared.Models
+@using BlazorBootstrap
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<PageTitle>DKDEV Library Nexus</PageTitle>
+
+<div class="nexus-library-page">
+
+    <header class="library-heading">
+        <div>
+            <span class="library-eyebrow">DKDEV · MULTIPLATFORM</span>
+            <h1>Library <span>Nexus</span></h1>
+            <p>Administra tu colección de libros desde un solo lugar.</p>
+        </div>
+
+        <div class="library-total-card">
+            <span class="total-label">Libros registrados</span>
+            <strong>@libros.Count</strong>
+            <span class="total-caption">Biblioteca digital</span>
+        </div>
+    </header>
+
+    @if (!string.IsNullOrWhiteSpace(mensaje))
+    {
+        <Alert Color="@tipoMensaje" Dismissable="true">
+            @mensaje
+        </Alert>
+    }
+
+    <section class="nexus-card nexus-form-card">
+        <div class="nexus-card-header">
+            <div>
+                <span class="section-kicker">GESTIÓN DE REGISTROS</span>
+                <h2>@(libroActual.Id == 0 ? "Agregar un libro" : "Actualizar libro")</h2>
+                <p>Completa los datos para registrar o modificar un libro.</p>
+            </div>
+            <div class="section-icon">📚</div>
+        </div>
+
+        <div class="nexus-card-body">
+            <EditForm Model="@libroActual" OnSubmit="@GuardarLibro">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="validation-summary" />
+
+                <div class="library-form-grid">
+                    <div class="form-field">
+                        <label for="nombreLibro">Nombre del libro</label>
+                        <InputText id="nombreLibro"
+                                   class="form-control nexus-input"
+                                   @bind-Value="libroActual.NombreLibro"
+                                   placeholder="Ej. Cien años de soledad" />
+                        <ValidationMessage For="@(() => libroActual.NombreLibro)" />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="autor">Autor</label>
+                        <InputText id="autor"
+                                   class="form-control nexus-input"
+                                   @bind-Value="libroActual.Autor"
+                                   placeholder="Ej. Gabriel García Márquez" />
+                        <ValidationMessage For="@(() => libroActual.Autor)" />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="numPaginas">Número de páginas</label>
+                        <NumberInput TValue="int"
+                                     id="numPaginas"
+                                     @bind-Value="libroActual.NumPaginas"
+                                     Min="1"
+                                     Max="100000"
+                                     EnableMinMax="true"
+                                     Placeholder="Cantidad de páginas" />
+                        <ValidationMessage For="@(() => libroActual.NumPaginas)" />
+                    </div>
+
+                    <div class="form-field">
+                        <label for="fechaPublicacion">Fecha de publicación</label>
+                        <DateInput TValue="DateOnly?"
+                                   id="fechaPublicacion"
+                                   @bind-Value="fechaPublicacion"
+                                   Placeholder="Selecciona una fecha" />
+                        <ValidationMessage For="@(() => libroActual.FechaPublicacion)" />
+                    </div>
+                </div>
+
+                <div class="library-form-actions">
+                    @if (libroActual.Id == 0)
+                    {
+                        <Button Type="ButtonType.Submit"
+                                Color="ButtonColor.Success"
+                                Outline="true"
+                                Size="ButtonSize.Large"
+                                Disabled="@procesando">
+                            Guardar libro
+                        </Button>
+                    }
+                    else
+                    {
+                        <Button Type="ButtonType.Submit"
+                                Color="ButtonColor.Warning"
+                                Size="ButtonSize.Medium"
+                                Disabled="@procesando">
+                            Actualizar libro
+                        </Button>
+
+                        <Button Color="ButtonColor.Secondary"
+                                Outline="true"
+                                Size="ButtonSize.Medium"
+                                Disabled="@procesando"
+                                @onclick="NuevoLibro">
+                            Cancelar edición
+                        </Button>
+                    }
+
+                    @if (libroActual.Id == 0)
+                    {
+                        <Button Color="ButtonColor.Secondary"
+                                Outline="true"
+                                Size="ButtonSize.Medium"
+                                Disabled="@procesando"
+                                @onclick="NuevoLibro">
+                            Limpiar
+                        </Button>
+                    }
+                </div>
+            </EditForm>
+        </div>
+    </section>
+
+    <section class="nexus-card nexus-list-card">
+        <div class="nexus-card-header">
+            <div>
+                <span class="section-kicker">COLECCIÓN DIGITAL</span>
+                <h2>Libros registrados</h2>
+                <p>Consulta, modifica o elimina los registros de la biblioteca.</p>
+            </div>
+            <div class="library-header-actions">
+                <Button Color="ButtonColor.Danger"
+                        Outline="true"
+                        Size="ButtonSize.Medium"
+                        Disabled="@procesando"
+                        @onclick="RestablecerBiblioteca">
+                    <span>↻ Restablecer biblioteca</span>
+                </Button>
+                <div class="section-icon">🗂️</div>
+            </div>
+        </div>
+
+        <div class="nexus-card-body">
+            @if (cargando)
+            {
+                <div class="library-loading">
+                    <div class="spinner-border" role="status"></div>
+                    <span>Cargando biblioteca...</span>
+                </div>
+            }
+            else if (libros.Count == 0)
+            {
+                <div class="library-empty-state">
+                    <div class="empty-icon">📖</div>
+                    <h3>Tu biblioteca está vacía</h3>
+                    <p>Agrega tu primer libro utilizando el formulario superior.</p>
+                </div>
+            }
+            else
+            {
+                <div class="library-table-wrapper">
+                    <table class="table nexus-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre del libro</th>
+                                <th>Autor</th>
+                                <th>Páginas</th>
+                                <th>Fecha de publicación</th>
+                                <th class="actions-column">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var libro in libros)
+                            {
+                                <tr @key="libro.Id">
+                                    <td><span class="book-id">#@libro.Id</span></td>
+                                    <td class="book-title">@libro.NombreLibro</td>
+                                    <td>@libro.Autor</td>
+                                    <td>@libro.NumPaginas</td>
+                                    <td>@(libro.FechaPublicacion?.ToString("dd-MM-yyyy") ?? "Sin fecha")</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <Button Color="ButtonColor.Warning"
+                                                    Size="ButtonSize.Small"
+                                                    Disabled="@procesando"
+                                                    @onclick="() => EditarLibro(libro)">
+                                                Editar
+                                            </Button>
+
+                                            <Button Color="ButtonColor.Danger"
+                                                    Outline="true"
+                                                    Size="ButtonSize.Medium"
+                                                    Disabled="@procesando"
+                                                    @onclick="() => EliminarLibro(libro.Id)">
+                                                Eliminar
+                                            </Button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="library-list-footer">
+                    <span>Total de registros: <strong>@libros.Count</strong></span>
+                    <span>DKDEV Library Nexus</span>
+                </div>
+            }
+        </div>
+    </section>
+
+    @if (procesando)
+    {
+        <div class="nexus-preload-overlay">
+            <div class="nexus-preload-content">
+                <Preload LoadingText="@mensajeCarga" />
+            </div>
+        </div>
+    }
+
+    <footer class="nexus-footer">
+        <span>DKDEV Library Nexus</span>
+        <span>Sistema de gestión bibliotecaria · 2026</span>
+    </footer>
+
+</div>
+
+@code {
+    private List<Libro> libros = new();
+    private Libro libroActual = new();
+
+    private DateOnly? fechaPublicacion = DateOnly.FromDateTime(DateTime.Today);
+
+    private bool cargando = true;
+    private bool procesando = false;
+
+    private string mensaje = string.Empty;
+    private string mensajeCarga = "Procesando solicitud...";
+    private AlertColor tipoMensaje = AlertColor.Success;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarLibros();
+    }
+
+    private async Task CargarLibros()
+    {
+        cargando = true;
+
+        try
+        {
+            libros = await Http.GetFromJsonAsync<List<Libro>>("api/Libro") ?? new();
+        }
+        catch (Exception ex)
+        {
+            MostrarMensaje($"No fue posible cargar los libros: {ex.Message}", AlertColor.Danger);
+        }
+        finally
+        {
+            cargando = false;
+        }
+    }
+
+    private async Task GuardarLibro(EditContext context)
+    {
+        LimpiarMensajes();
+
+        // Se convierte DateOnly a DateTime para mantener compatibilidad
+        // con el modelo y la base de datos existentes.
+        libroActual.FechaPublicacion =
+            fechaPublicacion?.ToDateTime(TimeOnly.MinValue);
+
+        if (!context.Validate())
+        {
+            return;
+        }
+
+        bool esNuevo = libroActual.Id == 0;
+
+        try
+        {
+            procesando = true;
+            mensajeCarga = esNuevo ? "Registrando libro..." : "Actualizando libro...";
+
+            HttpResponseMessage respuesta;
+
+            if (esNuevo)
+            {
+                var tareaSolicitud = Http.PostAsJsonAsync("api/Libro", libroActual);
+                await Task.WhenAll(tareaSolicitud, Task.Delay(3000));
+                respuesta = await tareaSolicitud;
+            }
+            else
+            {
+                var tareaSolicitud = Http.PutAsJsonAsync(
+                    $"api/Libro/{libroActual.Id}", libroActual);
+
+                await Task.WhenAll(tareaSolicitud, Task.Delay(3000));
+                respuesta = await tareaSolicitud;
+            }
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                MostrarMensaje(
+                    esNuevo
+                        ? "El libro fue registrado correctamente."
+                        : "El libro fue actualizado correctamente.",
+                    esNuevo ? AlertColor.Success : AlertColor.Warning);
+
+                NuevoLibro();
+                await CargarLibros();
+            }
+            else
+            {
+                var detalle = await respuesta.Content.ReadAsStringAsync();
+                MostrarMensaje(
+                    $"No se pudo completar la operación. {detalle}",
+                    AlertColor.Danger);
+            }
+        }
+        catch (Exception ex)
+        {
+            MostrarMensaje($"Ocurrió un error: {ex.Message}", AlertColor.Danger);
+        }
+        finally
+        {
+            procesando = false;
+        }
+    }
+
+    private void EditarLibro(Libro libro)
+    {
+        LimpiarMensajes();
+
+        libroActual = new Libro
+        {
+            Id = libro.Id,
+            NombreLibro = libro.NombreLibro,
+            Autor = libro.Autor,
+            NumPaginas = libro.NumPaginas,
+            FechaPublicacion = libro.FechaPublicacion
+        };
+
+        fechaPublicacion = libro.FechaPublicacion.HasValue
+            ? DateOnly.FromDateTime(libro.FechaPublicacion.Value)
+            : null;
+
+        mensaje = $"Editando el registro #{libro.Id}.";
+        tipoMensaje = AlertColor.Warning;
+    }
+
+    private async Task EliminarLibro(int id)
+    {
+        LimpiarMensajes();
+
+        bool confirmar = await JS.InvokeAsync<bool>(
+            "confirm",
+            "¿Estás seguro de que deseas eliminar este libro?");
+
+        if (!confirmar)
+        {
+            return;
+        }
+
+        try
+        {
+            procesando = true;
+            mensajeCarga = "Eliminando libro...";
+
+            var tareaSolicitud = Http.DeleteAsync($"api/Libro/{id}");
+            await Task.WhenAll(tareaSolicitud, Task.Delay(2000));
+
+            var respuesta = await tareaSolicitud;
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                if (libroActual.Id == id)
+                {
+                    NuevoLibro();
+                }
+
+                MostrarMensaje(
+                    "El libro fue eliminado correctamente.",
+                    AlertColor.Danger);
+
+                await CargarLibros();
+            }
+            else
+            {
+                var detalle = await respuesta.Content.ReadAsStringAsync();
+                MostrarMensaje(
+                    $"No se pudo eliminar el libro. {detalle}",
+                    AlertColor.Danger);
+            }
+        }
+        catch (Exception ex)
+        {
+            MostrarMensaje($"Ocurrió un error al eliminar: {ex.Message}", AlertColor.Danger);
+        }
+        finally
+        {
+            procesando = false;
+        }
+    }
+
+    private void NuevoLibro()
+    {
+        libroActual = new Libro
+        {
+            NumPaginas = 1,
+            FechaPublicacion = DateTime.Today
+        };
+
+        fechaPublicacion = DateOnly.FromDateTime(DateTime.Today);
+    }
+
+    private void MostrarMensaje(string texto, AlertColor color)
+    {
+        mensaje = texto;
+        tipoMensaje = color;
+    }
+
+    private void LimpiarMensajes()
+    {
+        mensaje = string.Empty;
+    }
+
+    private async Task RestablecerBiblioteca()
+    {
+        LimpiarMensajes();
+
+        bool confirmar = await JS.InvokeAsync<bool>(
+            "confirm",
+            "ATENCIÓN: se eliminarán los libros actuales y se recuperarán los tres registros originales. ¿Deseas continuar?");
+
+        if (!confirmar)
+        {
+            return;
+        }
+
+        try
+        {
+            procesando = true;
+            mensajeCarga = "Restableciendo biblioteca...";
+
+            var solicitud = Http.PostAsync("api/Libro/restablecer", content: null);
+            await Task.WhenAll(solicitud, Task.Delay(2000));
+
+            var respuesta = await solicitud;
+
+            if (respuesta.IsSuccessStatusCode)
+            {
+                NuevoLibro();
+                await CargarLibros();
+
+                MostrarMensaje(
+                    "Biblioteca restablecida correctamente. Se recuperaron los tres libros originales.",
+                    AlertColor.Success);
+            }
+            else
+            {
+                var detalle = await respuesta.Content.ReadAsStringAsync();
+                MostrarMensaje(
+                    $"No fue posible restablecer la biblioteca: {detalle}",
+                    AlertColor.Danger);
+            }
+        }
+        catch (Exception ex)
+        {
+            MostrarMensaje(
+                $"Error al restablecer la biblioteca: {ex.Message}",
+                AlertColor.Danger);
+        }
+        finally
+        {
+            procesando = false;
+        }
+    }
+}

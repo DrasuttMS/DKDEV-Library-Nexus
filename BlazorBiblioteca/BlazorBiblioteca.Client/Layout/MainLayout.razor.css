@@ -1,0 +1,170 @@
+
+/* ==========================================
+   DKDEV LIBRARY NEXUS
+   Main Layout - Diseño principal
+   ========================================== */
+
+.nexus-shell {
+    --nexus-bg: #080d18;
+    --nexus-panel: #101827;
+    --nexus-border: rgba(148, 163, 184, 0.13);
+    --nexus-text: #e5edf8;
+    --nexus-muted: #8b9bb2;
+    --nexus-cyan: #22d3ee;
+
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    background: var(--nexus-bg);
+    color: var(--nexus-text);
+}
+
+/* Menú lateral */
+
+.nexus-sidebar {
+    width: 260px;
+    min-width: 260px;
+    min-height: 100vh;
+    background: #0c1422;
+    border-right: 1px solid var(--nexus-border);
+}
+
+/* Área principal */
+
+.nexus-main {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 100vh;
+    background:
+        radial-gradient(
+            circle at 85% 0%,
+            rgba(34, 211, 238, 0.055),
+            transparent 30%
+        ),
+        var(--nexus-bg);
+}
+
+/* Barra superior */
+
+.nexus-topbar {
+    height: 68px;
+    min-height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    background: rgba(16, 24, 39, 0.78);
+    border-bottom: 1px solid var(--nexus-border);
+}
+
+.nexus-topbar-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+}
+
+.nexus-breadcrumb {
+    color: var(--nexus-cyan);
+    font-weight: 800;
+}
+
+.nexus-breadcrumb-separator {
+    color: #526176;
+}
+
+.nexus-breadcrumb-current {
+    color: var(--nexus-text);
+    font-weight: 600;
+}
+
+.nexus-topbar-status {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    color: var(--nexus-muted);
+    font-size: 12px;
+}
+
+.nexus-status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.55);
+}
+
+/* Contenido central */
+
+.nexus-content {
+    flex: 1;
+    width: 100%;
+    padding: 32px;
+}
+
+/* Pie de página */
+
+.nexus-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 32px;
+    border-top: 1px solid var(--nexus-border);
+    color: var(--nexus-muted);
+    font-size: 11px;
+}
+
+/* Mensaje de error de Blazor */
+
+#blazor-error-ui {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    padding: 14px 20px;
+    background: #7f1d1d;
+    color: white;
+    text-align: center;
+}
+
+#blazor-error-ui .dismiss {
+    cursor: pointer;
+    margin-left: 12px;
+}
+
+/* Adaptación a pantallas pequeñas */
+
+@media (max-width: 768px) {
+    .nexus-shell {
+        flex-direction: column;
+    }
+
+    .nexus-sidebar {
+        width: 100%;
+        min-width: 0;
+        min-height: auto;
+    }
+
+    .nexus-topbar {
+        height: 58px;
+        min-height: 58px;
+        padding: 0 16px;
+    }
+
+    .nexus-content {
+        padding: 18px 14px;
+    }
+
+    .nexus-footer {
+        padding: 14px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

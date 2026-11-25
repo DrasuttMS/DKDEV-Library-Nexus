@@ -1,0 +1,42 @@
+﻿
+@inherits LayoutComponentBase
+
+<div class="nexus-shell">
+
+    <aside class="nexus-sidebar">
+        <NavMenu />
+    </aside>
+
+    <main class="nexus-main">
+
+        <header class="nexus-topbar">
+            <div class="nexus-topbar-section">
+                <span class="nexus-breadcrumb">DKDEV</span>
+                <span class="nexus-breadcrumb-separator">/</span>
+                <span class="nexus-breadcrumb-current">Library Nexus</span>
+            </div>
+
+            <div class="nexus-topbar-status">
+                <span class="nexus-status-indicator"></span>
+                <span>Sistema activo</span>
+            </div>
+        </header>
+
+        <section class="nexus-content">
+            @Body
+        </section>
+
+        <footer class="nexus-footer">
+            <span>DKDEV Library Nexus</span>
+            <span>Gestión inteligente de biblioteca</span>
+        </footer>
+
+    </main>
+
+</div>
+
+<div id="blazor-error-ui">
+    Ha ocurrido un error inesperado.
+    <a href="" class="reload">Recargar aplicación</a>
+    <a class="dismiss">🗙</a>
+</div>

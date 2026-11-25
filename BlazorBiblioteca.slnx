@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="BlazorBiblioteca.Shared/BlazorBiblioteca.Shared.csproj" />
+  <Project Path="BlazorBiblioteca/BlazorBiblioteca.Client/BlazorBiblioteca.Client.csproj" />
+  <Project Path="BlazorBiblioteca/BlazorBiblioteca/BlazorBiblioteca.csproj" />
+</Solution>
